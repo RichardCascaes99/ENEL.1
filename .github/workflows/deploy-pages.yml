@@ -45,6 +45,47 @@ jobs:
         with:
           path: _site
 
+      - name: Ensure Pages is enabled
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            try {
+              await github.request("GET /repos/{owner}/{repo}/pages", { owner, repo });
+              core.info("Pages já está habilitado.");
+            } catch (error) {
+              if (error.status !== 404) {
+                throw error;
+              }
+
+              core.info("Pages não encontrado. Tentando habilitar para workflow.");
+
+              try {
+                await github.request("POST /repos/{owner}/{repo}/pages", {
+                  owner,
+                  repo,
+                  build_type: "workflow",
+                });
+              } catch (createError) {
+                core.info(`Falha ao criar com build_type=workflow: ${createError.message}`);
+                core.info("Tentando criar em modo legacy e atualizar para workflow.");
+
+                await github.request("POST /repos/{owner}/{repo}/pages", {
+                  owner,
+                  repo,
+                  source: { branch: "main", path: "/" },
+                });
+
+                await github.request("PUT /repos/{owner}/{repo}/pages", {
+                  owner,
+                  repo,
+                  build_type: "workflow",
+                });
+              }
+            }
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
