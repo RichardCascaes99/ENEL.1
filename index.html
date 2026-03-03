@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Plataforma Enel de treinamento gamificado com login, fases, vídeo e quiz de conhecimento."
+    />
+    <title>Plataforma Enel | Treinamento</title>
+    <link rel="icon" type="image/png" href="./assets/brand/clients/enel.png" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-layer" aria-hidden="true"></div>
+
+    <section id="loginView" class="view view-login">
+      <div class="login-shell">
+        <article class="window-card login-signature">
+          <video
+            id="signatureVideo"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            poster="./assets/brand/clients/enel.png"
+          >
+            <source src="./assets/enel/videos/Assinatura_ENEL.mov" type="video/quicktime" />
+          </video>
+        </article>
+
+        <article class="window-card login-card">
+          <img class="enel-logo" src="./assets/brand/clients/enel.png" alt="Enel" loading="eager" />
+
+          <p class="eyebrow">Treinamento Enel Mercado Livre de Energia</p>
+          <h1>Plataforma Enel</h1>
+          <p class="lead">
+            Acesse para iniciar as fases de aprendizagem e registrar a sua evolução.
+          </p>
+
+          <form id="loginForm" class="login-form" autocomplete="off">
+            <label for="username">Usuário</label>
+            <input id="username" name="username" type="text" required placeholder="Digite seu usuário" />
+
+            <label for="password">Senha</label>
+            <input id="password" name="password" type="password" required placeholder="Digite sua senha" />
+
+            <button type="submit" class="btn btn-primary">Entrar</button>
+          </form>
+
+          <p class="helper">Usuário de teste: <strong>usuário</strong> | senha: <strong>123</strong></p>
+          <p id="loginError" class="message message-error" role="alert" aria-live="polite"></p>
+        </article>
+      </div>
+    </section>
+
+    <section id="dashboardView" class="view view-dashboard hidden">
+      <header class="topbar window-card">
+        <div class="topbar-brand">
+          <img class="brand-mark" src="./assets/brand/clients/enel.png" alt="Enel" />
+          <div class="brand-mark-dark">
+            <img src="./assets/enel/logos/Logo bianco png.png" alt="Enel assinatura" />
+          </div>
+          <div>
+            <p class="eyebrow">Plataforma Enel</p>
+            <h2>Mercado Livre de Energia</h2>
+          </div>
+        </div>
+
+        <article class="profile-card">
+          <img
+            id="profilePhoto"
+            class="profile-photo"
+            src="./assets/team/optimized/aldo.webp"
+            alt="Foto do usuário"
+          />
+          <div class="profile-copy">
+            <p id="profileName" class="profile-name">Aldo Miike</p>
+            <p id="profileCategory" class="profile-category">Revendedor</p>
+            <p id="profileLevel" class="profile-level">Nível 1</p>
+          </div>
+          <button id="logoutButton" class="btn btn-ghost" type="button">Sair</button>
+        </article>
+      </header>
+
+      <main class="dashboard-grid">
+        <section class="window-card panel">
+          <div class="panel-head">
+            <h3>Mapa de Fases</h3>
+            <p>Complete uma fase por vez para liberar a próxima.</p>
+          </div>
+
+          <div class="status-strip" id="statusStrip">
+            <article>
+              <p class="status-label">Fases concluídas</p>
+              <p class="status-value" id="completedValue">0</p>
+            </article>
+            <article>
+              <p class="status-label">Nota média</p>
+              <p class="status-value" id="averageValue">0</p>
+            </article>
+            <article>
+              <p class="status-label">Nível atual</p>
+              <p class="status-value" id="currentPhaseValue">Nível 1</p>
+            </article>
+          </div>
+
+          <div id="phaseMap" class="phase-map" role="list" aria-label="Fases disponíveis"></div>
+        </section>
+
+        <section class="window-card panel">
+          <div class="panel-head">
+            <h3 id="missionTitle">Missão da fase</h3>
+            <p id="missionSubtitle">Selecione uma fase no mapa para iniciar.</p>
+          </div>
+
+          <div id="phaseEmpty" class="phase-empty">
+            Escolha a fase para abrir o vídeo e iniciar o teste de conhecimento.
+          </div>
+
+          <article id="phaseMission" class="phase-mission hidden" aria-live="polite">
+            <div class="video-box">
+              <video id="phaseVideo" controls preload="metadata" playsinline></video>
+            </div>
+
+            <p id="videoStatus" class="message message-info">
+              Modo de teste ativo: você pode adiantar o vídeo e iniciar o teste a qualquer momento.
+            </p>
+
+            <button id="startQuizButton" class="btn btn-primary" type="button" disabled>
+              INICIAR TESTE
+            </button>
+
+            <div id="quizFeedback" class="message hidden"></div>
+          </article>
+        </section>
+
+        <section class="window-card panel panel-history">
+          <div class="panel-head">
+            <h3>Histórico de notas</h3>
+            <p id="historySubtitle">Acompanhe todas as tentativas deste usuário.</p>
+          </div>
+
+          <div class="history-scroll">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Fase</th>
+                  <th>Nota</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+
+      <footer class="brand-footer window-card">
+        <p class="eyebrow">Assinaturas de marca</p>
+        <div class="footer-logos">
+          <img src="./assets/brand/clients/enel.png" alt="Enel" />
+          <div class="footer-dark-logo">
+            <img src="./assets/enel/logos/Logo bianco png.png" alt="Enel branco" />
+          </div>
+          <img src="./assets/brand/clients/porto.png" alt="Porto" />
+          <img src="./assets/brand/clients/bank.png" alt="Bank" />
+        </div>
+      </footer>
+    </section>
+
+    <div id="quizModal" class="modal hidden" aria-hidden="true">
+      <div class="modal-card window-card" role="dialog" aria-modal="true" aria-labelledby="quizModalTitle">
+        <div class="modal-head">
+          <h3 id="quizModalTitle">Teste de conhecimento</h3>
+          <button id="closeQuizButton" type="button" class="btn btn-ghost">Fechar</button>
+        </div>
+        <p class="modal-note">Cada pergunta vale 2 pontos. Nota máxima da fase: 10 pontos.</p>
+        <p id="quizModalAlert" class="message hidden"></p>
+        <form id="quizForm" class="quiz-form"></form>
+        <button id="submitQuizButton" class="btn btn-primary" type="button">Finalizar teste</button>
+      </div>
+    </div>
+
+    <div id="resultModal" class="modal hidden" aria-hidden="true">
+      <div class="modal-card modal-card-result window-card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+        <h3 id="resultTitle">Parabéns!</h3>
+        <p id="resultScoreText"></p>
+        <button id="closeResultButton" class="btn btn-primary" type="button">Continuar</button>
+      </div>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
