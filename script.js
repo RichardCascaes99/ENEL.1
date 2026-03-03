@@ -1,5 +1,6 @@
 const STORAGE_USERS = "plataformaEnel.users";
 const STORAGE_SESSION = "plataformaEnel.session";
+const STORAGE_LIVE_COMMENTS = "plataformaEnel.liveComments";
 const QUIZ_POINTS_PER_QUESTION = 2;
 const TEST_MODE = true;
 
@@ -9,9 +10,9 @@ const TEST_ACCOUNT = {
 };
 
 const USER_PROFILE = {
-  displayName: "Aldo Miike",
+  displayName: "Taline Souza",
   category: "Revendedor",
-  photo: "./assets/team/optimized/aldo.webp",
+  photo: "./fotos/taline.jpeg",
 };
 
 const BASE_PHASES = [
@@ -194,6 +195,19 @@ const BASE_PHASES = [
   },
 ];
 
+const CHAT_CLIENT_QUESTION_POOL = [
+  "Qual é a diferença entre mercado regulado e Mercado Livre de Energia?",
+  "Quanto uma empresa consegue economizar ao migrar?",
+  "Existe risco de ficar sem energia após a migração?",
+  "Quais documentos são necessários para começar?",
+  "Como funciona o contrato de fornecimento no mercado livre?",
+  "Quem faz a gestão mensal do consumo e das faturas?",
+  "Minha empresa é de médio porte. Já posso migrar?",
+  "O que muda na operação da empresa depois da migração?",
+  "Como eu comparo propostas de comercializadoras diferentes?",
+  "Quanto tempo leva para concluir a migração?",
+];
+
 const PHASES = TEST_MODE ? forceFirstOptionAsCorrect(BASE_PHASES) : BASE_PHASES;
 
 function forceFirstOptionAsCorrect(phases) {
@@ -211,10 +225,7 @@ function forceFirstOptionAsCorrect(phases) {
 
       return {
         ...question,
-        options: [
-          question.options[safeIndex],
-          ...question.options.filter((_, index) => index !== safeIndex),
-        ],
+        options: [question.options[safeIndex], ...question.options.filter((_, index) => index !== safeIndex)],
         correctIndex: 0,
       };
     }),
@@ -233,6 +244,8 @@ const elements = {
   profileCategory: document.getElementById("profileCategory"),
   profileLevel: document.getElementById("profileLevel"),
   logoutButton: document.getElementById("logoutButton"),
+  tabButtons: Array.from(document.querySelectorAll(".tab-button")),
+  tabPanels: Array.from(document.querySelectorAll(".tab-panel")),
   phaseMap: document.getElementById("phaseMap"),
   missionTitle: document.getElementById("missionTitle"),
   missionSubtitle: document.getElementById("missionSubtitle"),
@@ -254,6 +267,21 @@ const elements = {
   resultModal: document.getElementById("resultModal"),
   closeResultButton: document.getElementById("closeResultButton"),
   resultScoreText: document.getElementById("resultScoreText"),
+  roleClienteButton: document.getElementById("roleClienteButton"),
+  roleVendedorButton: document.getElementById("roleVendedorButton"),
+  chatRoleStatus: document.getElementById("chatRoleStatus"),
+  chatMessages: document.getElementById("chatMessages"),
+  chatForm: document.getElementById("chatForm"),
+  chatInput: document.getElementById("chatInput"),
+  chatSendButton: document.getElementById("chatSendButton"),
+  liveDays: document.getElementById("liveDays"),
+  liveHours: document.getElementById("liveHours"),
+  liveMinutes: document.getElementById("liveMinutes"),
+  liveSeconds: document.getElementById("liveSeconds"),
+  liveNextDate: document.getElementById("liveNextDate"),
+  liveCommentForm: document.getElementById("liveCommentForm"),
+  liveCommentInput: document.getElementById("liveCommentInput"),
+  liveCommentsList: document.getElementById("liveCommentsList"),
 };
 
 const state = {
@@ -261,6 +289,12 @@ const state = {
   currentUser: null,
   activePhaseId: null,
   watchedCurrentVideo: false,
+  activeTab: "jornada",
+  chatRole: null,
+  chatTurns: 0,
+  chatQuestionQueue: [],
+  chatFinalSent: false,
+  liveComments: loadLiveComments(),
 };
 
 bootstrap();
@@ -268,6 +302,7 @@ bootstrap();
 function bootstrap() {
   elements.loginForm.addEventListener("submit", handleLogin);
   elements.logoutButton.addEventListener("click", handleLogout);
+
   elements.startQuizButton.addEventListener("click", showQuiz);
   elements.submitQuizButton.addEventListener("click", submitQuiz);
   elements.closeQuizButton.addEventListener("click", () => closeModal(elements.quizModal));
@@ -293,11 +328,7 @@ function bootstrap() {
 
   elements.phaseVideo.addEventListener("ended", () => {
     state.watchedCurrentVideo = true;
-    setMessage(
-      elements.videoStatus,
-      "Vídeo concluído. O teste da fase foi liberado.",
-      "message-success"
-    );
+    setMessage(elements.videoStatus, "Vídeo concluído. O teste da fase foi liberado.", "message-success");
     elements.startQuizButton.disabled = false;
   });
 
@@ -310,6 +341,23 @@ function bootstrap() {
       "message-warning"
     );
   });
+
+  elements.tabButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const target = button.dataset.tabTarget;
+      if (!target) return;
+      activateTab(target);
+    });
+  });
+
+  elements.roleClienteButton.addEventListener("click", () => selectChatRole("cliente"));
+  elements.roleVendedorButton.addEventListener("click", () => selectChatRole("vendedor"));
+  elements.chatForm.addEventListener("submit", handleChatSubmit);
+
+  elements.liveCommentForm.addEventListener("submit", handleLiveCommentSubmit);
+  renderLiveComments();
+  updateLiveCountdown();
+  setInterval(updateLiveCountdown, 1000);
 
   restoreSession();
 }
@@ -333,11 +381,7 @@ function handleLogin(event) {
   const isAllowedPassword = password === TEST_ACCOUNT.password;
 
   if (!isAllowedUser || !isAllowedPassword) {
-    setMessage(
-      elements.loginError,
-      "Login inválido. Use usuário e senha de teste informados.",
-      "message-error"
-    );
+    setMessage(elements.loginError, "Login inválido. Use usuário e senha de teste informados.", "message-error");
     return;
   }
 
@@ -367,6 +411,7 @@ function handleLogout() {
 
   closeModal(elements.quizModal);
   closeModal(elements.resultModal);
+  resetChat();
 
   elements.dashboardView.classList.add("hidden");
   elements.loginView.classList.remove("hidden");
@@ -393,13 +438,32 @@ function openDashboard() {
   elements.profileName.textContent = USER_PROFILE.displayName;
   elements.profileCategory.textContent = USER_PROFILE.category;
 
+  activateTab("jornada");
+  resetChat();
+
   renderStatusStrip();
   renderPhaseMap();
   renderHistory();
+  renderLiveComments();
 
   const progress = getUserProgress();
   const defaultPhase = Math.min(progress.unlockedPhase, PHASES.length);
   openPhase(defaultPhase);
+}
+
+function activateTab(tabKey) {
+  state.activeTab = tabKey;
+
+  elements.tabButtons.forEach((button) => {
+    const isActive = button.dataset.tabTarget === tabKey;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+  });
+
+  elements.tabPanels.forEach((panel) => {
+    const isActive = panel.dataset.tabPanel === tabKey;
+    panel.classList.toggle("hidden", !isActive);
+  });
 }
 
 function openPhase(phaseId) {
@@ -442,11 +506,7 @@ function openPhase(phaseId) {
     );
   } else {
     elements.startQuizButton.disabled = true;
-    setMessage(
-      elements.videoStatus,
-      "Assista ao vídeo até o final para liberar o quiz.",
-      "message-info"
-    );
+    setMessage(elements.videoStatus, "Assista ao vídeo até o final para liberar o quiz.", "message-info");
   }
 
   elements.quizFeedback.classList.add("hidden");
@@ -556,14 +616,13 @@ function submitQuiz() {
   }, 0);
 
   const score = correctAnswers * QUIZ_POINTS_PER_QUESTION;
-  const maxScore = phase.questions.length * QUIZ_POINTS_PER_QUESTION;
 
   const progress = getUserProgress();
   progress.history.push({
     phaseId: phase.id,
     phaseTitle: phase.title,
     score,
-    maxScore,
+    maxScore: phase.questions.length * QUIZ_POINTS_PER_QUESTION,
     answers,
     completedAt: new Date().toISOString(),
   });
@@ -601,8 +660,7 @@ function renderHistory() {
 
   if (entries.length === 0) {
     const row = document.createElement("tr");
-    row.innerHTML =
-      '<td colspan="4">Nenhuma tentativa registrada ainda. Conclua uma fase para gerar histórico.</td>';
+    row.innerHTML = '<td colspan="4">Nenhuma tentativa registrada ainda. Conclua uma fase para gerar histórico.</td>';
     elements.historyBody.appendChild(row);
     return;
   }
@@ -641,6 +699,283 @@ function renderStatusStrip() {
   elements.profileLevel.textContent = `Nível ${currentLevel}`;
 }
 
+function selectChatRole(role) {
+  state.chatRole = role;
+  state.chatTurns = 0;
+  state.chatQuestionQueue = shuffleArray([...CHAT_CLIENT_QUESTION_POOL]);
+  state.chatFinalSent = false;
+
+  elements.roleClienteButton.classList.toggle("is-active", role === "cliente");
+  elements.roleVendedorButton.classList.toggle("is-active", role === "vendedor");
+
+  elements.chatInput.disabled = false;
+  elements.chatSendButton.disabled = false;
+  elements.chatInput.value = "";
+  elements.chatMessages.innerHTML = "";
+
+  if (role === "cliente") {
+    setMessage(
+      elements.chatRoleStatus,
+      "Você está simulando um cliente. O chat atuará como vendedor e responderá suas dúvidas.",
+      "message-info"
+    );
+    addChatMessage(
+      "Vendedor IA",
+      "Olá! Sou seu vendedor virtual. Posso explicar o Mercado Livre de Energia e orientar os próximos passos.",
+      "bot"
+    );
+    return;
+  }
+
+  setMessage(
+    elements.chatRoleStatus,
+    "Você está simulando um vendedor. O chat atuará como cliente e fará perguntas aleatórias.",
+    "message-info"
+  );
+  addChatMessage("Cliente IA", "Perfeito, vou simular um possível consumidor com dúvidas reais.", "bot");
+  askNextClientQuestion();
+}
+
+function handleChatSubmit(event) {
+  event.preventDefault();
+
+  const text = elements.chatInput.value.trim();
+  if (!text) return;
+
+  if (!state.chatRole) {
+    setMessage(elements.chatRoleStatus, "Selecione um papel antes de iniciar a conversa.", "message-warning");
+    return;
+  }
+
+  addChatMessage("Você", text, "user");
+  elements.chatInput.value = "";
+  elements.chatInput.focus();
+
+  if (state.chatRole === "cliente") {
+    respondAsSeller(text);
+    return;
+  }
+
+  respondAsClient();
+}
+
+function respondAsSeller(userText) {
+  state.chatTurns += 1;
+
+  const normalized = normalizeText(userText);
+  let response =
+    "Ótima pergunta. No Mercado Livre de Energia, você pode negociar condições de contrato com mais flexibilidade e previsibilidade.";
+
+  if (/(o que|como funciona|mercado livre|diferenca|diferença)/.test(normalized)) {
+    response =
+      "O Mercado Livre de Energia é o ambiente em que empresas elegíveis escolhem seu fornecedor e negociam preço, prazo e volume de energia.";
+  } else if (/(migrar|migracao|migração|adquirir|contratar|comecar|começar)/.test(normalized)) {
+    response =
+      "Para adquirir no mercado livre, o primeiro passo é analisar seu perfil de consumo. Depois disso, estruturamos estratégia de compra, contrato e cronograma de migração.";
+  } else if (/(preco|preço|economia|tarifa|valor)/.test(normalized)) {
+    response =
+      "A economia depende do perfil de consumo e da estratégia contratual. Em geral, empresas que planejam bem conseguem reduzir custo e ganhar previsibilidade financeira.";
+  } else if (/(quem pode|requisito|demanda|consumo medio|consumo médio)/.test(normalized)) {
+    response =
+      "A elegibilidade depende dos critérios regulatórios vigentes. Nós avaliamos seus dados de demanda e consumo para indicar o melhor caminho de migração.";
+  } else if (/(risco|seguranca|segurança|garantia|confianca|confiança)/.test(normalized)) {
+    response =
+      "A operação é segura quando há boa gestão contratual e acompanhamento contínuo. O fornecimento físico segue pela distribuidora, enquanto a energia é negociada no ambiente livre.";
+  }
+
+  addChatMessage("Vendedor IA", response, "bot");
+
+  if (state.chatTurns >= 3 && !state.chatFinalSent) {
+    state.chatFinalSent = true;
+    addChatMessage(
+      "Vendedor IA",
+      "Para avançar com uma proposta completa e personalizada, recomendo falar com um vendedor humano agora. Posso te direcionar para esse atendimento.",
+      "bot"
+    );
+  }
+}
+
+function respondAsClient() {
+  if (state.chatQuestionQueue.length > 0) {
+    askNextClientQuestion();
+    return;
+  }
+
+  if (!state.chatFinalSent) {
+    state.chatFinalSent = true;
+    addChatMessage(
+      "Cliente IA",
+      "Perfeito, suas explicações esclareceram minhas dúvidas. Vou falar com um vendedor humano para seguir com a contratação.",
+      "bot"
+    );
+    return;
+  }
+
+  addChatMessage("Cliente IA", "Obrigado, isso já me ajuda bastante para tomar uma decisão.", "bot");
+}
+
+function askNextClientQuestion() {
+  if (state.chatQuestionQueue.length === 0) return;
+
+  const question = state.chatQuestionQueue.shift();
+  const openers = [
+    "Tenho outra dúvida:",
+    "Me explique também:",
+    "Quero entender o seguinte:",
+    "Para avançar, preciso saber:",
+  ];
+
+  const opener = openers[Math.floor(Math.random() * openers.length)];
+  addChatMessage("Cliente IA", `${opener} ${question}`, "bot");
+}
+
+function addChatMessage(author, text, type) {
+  const bubble = document.createElement("article");
+  bubble.className = `chat-bubble chat-bubble--${type}`;
+
+  const meta = document.createElement("p");
+  meta.className = "chat-bubble-meta";
+  meta.textContent = author;
+
+  const copy = document.createElement("p");
+  copy.textContent = text;
+
+  bubble.appendChild(meta);
+  bubble.appendChild(copy);
+  elements.chatMessages.appendChild(bubble);
+  elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+}
+
+function resetChat() {
+  state.chatRole = null;
+  state.chatTurns = 0;
+  state.chatQuestionQueue = [];
+  state.chatFinalSent = false;
+
+  elements.roleClienteButton.classList.remove("is-active");
+  elements.roleVendedorButton.classList.remove("is-active");
+
+  elements.chatInput.value = "";
+  elements.chatInput.disabled = true;
+  elements.chatSendButton.disabled = true;
+
+  elements.chatMessages.innerHTML = "";
+  setMessage(elements.chatRoleStatus, "Selecione um papel para iniciar a conversa.", "message-info");
+}
+
+function handleLiveCommentSubmit(event) {
+  event.preventDefault();
+
+  const text = elements.liveCommentInput.value.trim();
+  if (!text) return;
+
+  state.liveComments.unshift({
+    author: USER_PROFILE.displayName,
+    role: USER_PROFILE.category,
+    text,
+    createdAt: new Date().toISOString(),
+  });
+
+  state.liveComments = state.liveComments.slice(0, 120);
+  saveLiveComments();
+  renderLiveComments();
+
+  elements.liveCommentInput.value = "";
+  elements.liveCommentInput.focus();
+}
+
+function renderLiveComments() {
+  elements.liveCommentsList.innerHTML = "";
+
+  if (state.liveComments.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "live-comments-empty";
+    empty.textContent = "Nenhum comentário ainda. Seja o primeiro a participar da live.";
+    elements.liveCommentsList.appendChild(empty);
+    return;
+  }
+
+  state.liveComments.forEach((comment) => {
+    const item = document.createElement("article");
+    item.className = "comment-item";
+
+    const meta = document.createElement("p");
+    meta.className = "comment-meta";
+    meta.textContent = `${comment.author} • ${formatDate(comment.createdAt)}`;
+
+    const text = document.createElement("p");
+    text.className = "comment-text";
+    text.textContent = comment.text;
+
+    item.appendChild(meta);
+    item.appendChild(text);
+    elements.liveCommentsList.appendChild(item);
+  });
+}
+
+function updateLiveCountdown() {
+  const now = new Date();
+  const target = getNextLiveDate(now);
+  const diff = Math.max(0, target.getTime() - now.getTime());
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  elements.liveDays.textContent = padTime(days);
+  elements.liveHours.textContent = padTime(hours);
+  elements.liveMinutes.textContent = padTime(minutes);
+  elements.liveSeconds.textContent = padTime(seconds);
+
+  const formattedDate = new Intl.DateTimeFormat("pt-BR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(target);
+
+  elements.liveNextDate.textContent = `Próxima transmissão: ${formattedDate}`;
+}
+
+function getNextLiveDate(referenceDate) {
+  const targetDay = 4;
+  const liveHour = 20;
+
+  const next = new Date(referenceDate);
+  const currentDay = referenceDate.getDay();
+  let dayDelta = (targetDay - currentDay + 7) % 7;
+
+  const alreadyPassedToday =
+    dayDelta === 0 &&
+    (referenceDate.getHours() > liveHour ||
+      (referenceDate.getHours() === liveHour && referenceDate.getMinutes() > 0) ||
+      (referenceDate.getHours() === liveHour && referenceDate.getMinutes() === 0 && referenceDate.getSeconds() > 0));
+
+  if (alreadyPassedToday) {
+    dayDelta = 7;
+  }
+
+  next.setDate(referenceDate.getDate() + dayDelta);
+  next.setHours(liveHour, 0, 0, 0);
+  return next;
+}
+
+function padTime(value) {
+  return String(value).padStart(2, "0");
+}
+
+function shuffleArray(array) {
+  const copy = [...array];
+  for (let index = copy.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [copy[index], copy[randomIndex]] = [copy[randomIndex], copy[index]];
+  }
+  return copy;
+}
+
 function formatDate(isoString) {
   const date = new Date(isoString);
   return new Intl.DateTimeFormat("pt-BR", {
@@ -655,6 +990,7 @@ function formatDate(isoString) {
 function setMessage(target, text, className) {
   target.textContent = text;
   target.className = "message";
+
   if (className) {
     target.classList.add(className);
   }
@@ -792,4 +1128,22 @@ function saveUsers() {
 
 function persistSession(username) {
   localStorage.setItem(STORAGE_SESSION, username);
+}
+
+function loadLiveComments() {
+  try {
+    const raw = localStorage.getItem(STORAGE_LIVE_COMMENTS);
+    if (!raw) return [];
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed.filter((item) => item && typeof item.text === "string");
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveLiveComments() {
+  localStorage.setItem(STORAGE_LIVE_COMMENTS, JSON.stringify(state.liveComments));
 }

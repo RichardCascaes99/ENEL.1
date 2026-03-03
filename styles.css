@@ -132,23 +132,30 @@ p {
 }
 
 .login-card {
-  padding: clamp(1.4rem, 3vw, 2.2rem);
+  padding: clamp(0.45rem, 1.1vw, 0.7rem) clamp(1.4rem, 3vw, 2.2rem) clamp(1.4rem, 3vw, 2.2rem);
 }
 
 .enel-logo {
   width: min(320px, 48vw);
+  height: clamp(48px, 6.6vw, 62px);
   display: block;
-  margin: 0 auto 0.9rem;
+  margin: 0 auto 0.15rem;
+  object-fit: cover;
+  object-position: center;
 }
 
 h1 {
-  margin-top: 0.35rem;
+  margin-top: 0.2rem;
   font-size: clamp(1.8rem, 4vw, 2.45rem);
   line-height: 1.08;
 }
 
+.login-card .lead {
+  margin-top: 0.3rem;
+}
+
 .login-form {
-  margin-top: 1.2rem;
+  margin-top: 0.65rem;
   display: grid;
   gap: 0.72rem;
 }
@@ -250,6 +257,43 @@ input[type="password"]:focus {
 .view-dashboard {
   padding-top: 0.85rem;
   padding-bottom: 1.3rem;
+}
+
+.top-tabs {
+  margin-top: 0.85rem;
+  padding: 0.45rem;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.tab-button {
+  border: 0;
+  border-radius: 14px;
+  padding: 0.68rem 0.7rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: rgba(65, 185, 230, 0.13);
+  cursor: pointer;
+  transition: background var(--timing), color var(--timing), transform var(--timing);
+}
+
+.tab-button:hover {
+  transform: translateY(-1px);
+}
+
+.tab-button.is-active {
+  color: #ffffff;
+  background: linear-gradient(130deg, var(--enel-pink), #ff458b);
+}
+
+.tab-area {
+  margin-top: 0.9rem;
+}
+
+.tab-panel {
+  display: block;
 }
 
 .topbar {
@@ -579,6 +623,347 @@ input[type="password"]:focus {
   height: 24px;
 }
 
+.chat-panel {
+  min-height: 72dvh;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  gap: 0.8rem;
+}
+
+.chat-role-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.role-btn {
+  border: 1px solid rgba(65, 185, 230, 0.35);
+  background: #ffffff;
+  color: var(--ink);
+  padding: 0.68rem 1rem;
+}
+
+.role-btn.is-active {
+  border-color: transparent;
+  color: #ffffff;
+  background: linear-gradient(120deg, var(--enel-pink), #ff458b);
+}
+
+.chat-messages {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 0.9rem;
+  background: linear-gradient(160deg, #ffffff, #f8fcff);
+  overflow-y: auto;
+  min-height: 320px;
+  max-height: 54dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.chat-bubble {
+  width: fit-content;
+  max-width: min(85%, 720px);
+  border-radius: 16px;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--line);
+  line-height: 1.42;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.chat-bubble p {
+  margin: 0;
+}
+
+.chat-bubble--user {
+  align-self: flex-end;
+  color: #ffffff;
+  border-color: transparent;
+  background: linear-gradient(120deg, var(--enel-pink), #ff458b);
+}
+
+.chat-bubble--bot {
+  align-self: flex-start;
+  background: #ffffff;
+  color: var(--ink);
+}
+
+.chat-bubble-meta {
+  margin-bottom: 0.24rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.78;
+}
+
+.chat-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem;
+}
+
+.chat-form .btn-primary {
+  margin-top: 0;
+}
+
+.season-grid {
+  margin-top: 0.85rem;
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.season-card {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 0.85rem;
+  background: linear-gradient(145deg, #ffffff, #f4fbff);
+}
+
+.season-card h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.episode-list {
+  margin-top: 0.7rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.episode-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  border-radius: 14px;
+  border: 1px solid rgba(2, 26, 70, 0.14);
+  background: #ffffff;
+  color: var(--ink);
+  padding: 0.66rem 0.72rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.episode-item span {
+  font-size: 0.86rem;
+}
+
+.episode-item strong {
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+}
+
+.episode-item:hover {
+  border-color: rgba(65, 185, 230, 0.5);
+  background: #f8fcff;
+}
+
+.live-panel {
+  min-height: 72dvh;
+}
+
+.live-grid {
+  margin-top: 0.85rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  gap: 1rem;
+}
+
+.live-main {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.live-player-box {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  overflow: hidden;
+  background: linear-gradient(140deg, #091a40, #133b82);
+}
+
+.live-player-box video {
+  width: 100%;
+  max-height: 460px;
+  display: block;
+  object-fit: cover;
+  background: #0a1840;
+}
+
+.live-note {
+  margin: 0;
+  padding: 0.7rem 0.75rem;
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(2, 12, 34, 0.4);
+}
+
+.countdown-card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 0.85rem;
+  background: linear-gradient(145deg, #ffffff, #f4fbff);
+}
+
+.countdown-title {
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+}
+
+.countdown-grid {
+  margin-top: 0.5rem;
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.countdown-grid article {
+  text-align: center;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  padding: 0.46rem 0.38rem;
+  background: #ffffff;
+}
+
+.countdown-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--enel-pink);
+}
+
+.countdown-label {
+  margin-top: 0.12rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+
+.countdown-next {
+  margin-top: 0.56rem;
+  font-size: 0.84rem;
+  color: var(--ink-soft);
+}
+
+.live-comments {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 0.8rem;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 0.65rem;
+}
+
+.live-comments h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.live-comment-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.55rem;
+}
+
+.live-comment-form .btn-primary {
+  margin-top: 0;
+}
+
+.live-comments-list {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.7rem;
+  background: linear-gradient(145deg, #ffffff, #f8fcff);
+  overflow-y: auto;
+  max-height: 520px;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.comment-item {
+  border: 1px solid rgba(2, 26, 70, 0.1);
+  border-radius: 12px;
+  padding: 0.55rem 0.62rem;
+  background: #ffffff;
+}
+
+.comment-meta {
+  margin: 0 0 0.2rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+
+.comment-text {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+
+.live-comments-empty {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}
+
+.news-grid {
+  margin-top: 0.85rem;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+  max-height: 62dvh;
+  overflow-y: auto;
+  padding-right: 0.35rem;
+  align-content: start;
+}
+
+.news-card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 0.85rem;
+  background: linear-gradient(145deg, #ffffff, #f4fbff);
+  display: grid;
+  gap: 0.48rem;
+}
+
+.news-date {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+
+.news-card h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.news-card p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+
+.news-tag {
+  display: inline-block;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.25rem 0.56rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(120deg, var(--enel-pink), #ff458b);
+}
+
 .modal {
   position: fixed;
   inset: 0;
@@ -690,6 +1075,14 @@ input[type="password"]:focus {
   .panel-history {
     grid-column: auto;
   }
+
+  .top-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .live-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 760px) {
@@ -726,5 +1119,14 @@ input[type="password"]:focus {
 
   .history-table {
     min-width: 560px;
+  }
+
+  .chat-form,
+  .live-comment-form {
+    grid-template-columns: 1fr;
+  }
+
+  .countdown-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

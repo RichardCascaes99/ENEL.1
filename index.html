@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Plataforma Enel de treinamento gamificado com login, fases, vídeo e quiz de conhecimento."
+      content="Plataforma Enel de treinamento gamificado com login, trilha, chat, podcast, live e novidades."
     />
     <title>Plataforma Enel | Treinamento</title>
     <link rel="icon" type="image/png" href="./assets/brand/clients/enel.png" />
@@ -72,11 +72,11 @@
           <img
             id="profilePhoto"
             class="profile-photo"
-            src="./assets/team/optimized/aldo.webp"
+            src="./fotos/taline.jpeg"
             alt="Foto do usuário"
           />
           <div class="profile-copy">
-            <p id="profileName" class="profile-name">Aldo Miike</p>
+            <p id="profileName" class="profile-name">Taline Souza</p>
             <p id="profileCategory" class="profile-category">Revendedor</p>
             <p id="profileLevel" class="profile-level">Nível 1</p>
           </div>
@@ -84,91 +84,306 @@
         </article>
       </header>
 
-      <main class="dashboard-grid">
-        <section class="window-card panel">
-          <div class="panel-head">
-            <h3>Mapa de Fases</h3>
-            <p>Complete uma fase por vez para liberar a próxima.</p>
+      <nav class="top-tabs window-card" role="tablist" aria-label="Navegação principal da plataforma">
+        <button class="tab-button is-active" type="button" data-tab-target="jornada" role="tab" aria-selected="true">
+          Jornada
+        </button>
+        <button class="tab-button" type="button" data-tab-target="chat" role="tab" aria-selected="false">
+          Chat
+        </button>
+        <button class="tab-button" type="button" data-tab-target="podcast" role="tab" aria-selected="false">
+          PodCast
+        </button>
+        <button class="tab-button" type="button" data-tab-target="live" role="tab" aria-selected="false">
+          Live
+        </button>
+        <button class="tab-button" type="button" data-tab-target="novidades" role="tab" aria-selected="false">
+          Novidades
+        </button>
+      </nav>
+
+      <main class="tab-area">
+        <section class="tab-panel" data-tab-panel="jornada">
+          <div class="dashboard-grid">
+            <section class="window-card panel">
+              <div class="panel-head">
+                <h3>Mapa de Fases</h3>
+                <p>Complete uma fase por vez para liberar a próxima.</p>
+              </div>
+
+              <div class="status-strip" id="statusStrip">
+                <article>
+                  <p class="status-label">Fases concluídas</p>
+                  <p class="status-value" id="completedValue">0</p>
+                </article>
+                <article>
+                  <p class="status-label">Nota média</p>
+                  <p class="status-value" id="averageValue">0</p>
+                </article>
+                <article>
+                  <p class="status-label">Nível atual</p>
+                  <p class="status-value" id="currentPhaseValue">Nível 1</p>
+                </article>
+              </div>
+
+              <div id="phaseMap" class="phase-map" role="list" aria-label="Fases disponíveis"></div>
+            </section>
+
+            <section class="window-card panel">
+              <div class="panel-head">
+                <h3 id="missionTitle">Missão da fase</h3>
+                <p id="missionSubtitle">Selecione uma fase no mapa para iniciar.</p>
+              </div>
+
+              <div id="phaseEmpty" class="phase-empty">
+                Escolha a fase para abrir o vídeo e iniciar o teste de conhecimento.
+              </div>
+
+              <article id="phaseMission" class="phase-mission hidden" aria-live="polite">
+                <div class="video-box">
+                  <video id="phaseVideo" controls preload="metadata" playsinline></video>
+                </div>
+
+                <p id="videoStatus" class="message message-info">
+                  Modo de teste ativo: você pode adiantar o vídeo e iniciar o teste a qualquer momento.
+                </p>
+
+                <button id="startQuizButton" class="btn btn-primary" type="button" disabled>
+                  INICIAR TESTE
+                </button>
+
+                <div id="quizFeedback" class="message hidden"></div>
+              </article>
+            </section>
+
+            <section class="window-card panel panel-history">
+              <div class="panel-head">
+                <h3>Histórico de notas</h3>
+                <p id="historySubtitle">Acompanhe todas as tentativas deste usuário.</p>
+              </div>
+
+              <div class="history-scroll">
+                <table class="history-table">
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Fase</th>
+                      <th>Nota</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historyBody"></tbody>
+                </table>
+              </div>
+            </section>
           </div>
 
-          <div class="status-strip" id="statusStrip">
-            <article>
-              <p class="status-label">Fases concluídas</p>
-              <p class="status-value" id="completedValue">0</p>
-            </article>
-            <article>
-              <p class="status-label">Nota média</p>
-              <p class="status-value" id="averageValue">0</p>
-            </article>
-            <article>
-              <p class="status-label">Nível atual</p>
-              <p class="status-value" id="currentPhaseValue">Nível 1</p>
-            </article>
-          </div>
-
-          <div id="phaseMap" class="phase-map" role="list" aria-label="Fases disponíveis"></div>
+          <footer class="brand-footer window-card">
+            <p class="eyebrow">Assinaturas de marca</p>
+            <div class="footer-logos">
+              <img src="./assets/brand/clients/enel.png" alt="Enel" />
+              <div class="footer-dark-logo">
+                <img src="./assets/enel/logos/Logo bianco png.png" alt="Enel branco" />
+              </div>
+              <img src="./assets/brand/clients/porto.png" alt="Porto" />
+              <img src="./assets/brand/clients/bank.png" alt="Bank" />
+            </div>
+          </footer>
         </section>
 
-        <section class="window-card panel">
-          <div class="panel-head">
-            <h3 id="missionTitle">Missão da fase</h3>
-            <p id="missionSubtitle">Selecione uma fase no mapa para iniciar.</p>
-          </div>
-
-          <div id="phaseEmpty" class="phase-empty">
-            Escolha a fase para abrir o vídeo e iniciar o teste de conhecimento.
-          </div>
-
-          <article id="phaseMission" class="phase-mission hidden" aria-live="polite">
-            <div class="video-box">
-              <video id="phaseVideo" controls preload="metadata" playsinline></video>
+        <section class="tab-panel hidden" data-tab-panel="chat">
+          <article class="window-card panel chat-panel">
+            <div class="panel-head">
+              <h3>Chat</h3>
+              <p>
+                Escolha seu papel antes de começar. Você pode simular conversa como cliente ou como vendedor.
+              </p>
             </div>
 
-            <p id="videoStatus" class="message message-info">
-              Modo de teste ativo: você pode adiantar o vídeo e iniciar o teste a qualquer momento.
+            <div class="chat-role-picker" role="group" aria-label="Escolha seu papel no chat">
+              <button id="roleClienteButton" class="btn role-btn" type="button">Quero ser Cliente</button>
+              <button id="roleVendedorButton" class="btn role-btn" type="button">Quero ser Vendedor</button>
+            </div>
+
+            <p id="chatRoleStatus" class="message message-info">
+              Selecione um papel para iniciar a conversa.
             </p>
 
-            <button id="startQuizButton" class="btn btn-primary" type="button" disabled>
-              INICIAR TESTE
-            </button>
+            <div id="chatMessages" class="chat-messages" aria-live="polite"></div>
 
-            <div id="quizFeedback" class="message hidden"></div>
+            <form id="chatForm" class="chat-form">
+              <input
+                id="chatInput"
+                type="text"
+                placeholder="Digite sua mensagem"
+                autocomplete="off"
+                disabled
+              />
+              <button id="chatSendButton" type="submit" class="btn btn-primary" disabled>Enviar</button>
+            </form>
           </article>
         </section>
 
-        <section class="window-card panel panel-history">
-          <div class="panel-head">
-            <h3>Histórico de notas</h3>
-            <p id="historySubtitle">Acompanhe todas as tentativas deste usuário.</p>
-          </div>
+        <section class="tab-panel hidden" data-tab-panel="podcast">
+          <article class="window-card panel">
+            <div class="panel-head">
+              <h3>PodCast</h3>
+              <p>
+                Conteúdos com especialistas em Mercado Livre de Energia, organizados por temporada.
+              </p>
+            </div>
 
-          <div class="history-scroll">
-            <table class="history-table">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Fase</th>
-                  <th>Nota</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="historyBody"></tbody>
-            </table>
-          </div>
+            <div class="season-grid">
+              <section class="season-card">
+                <h4>Temporada 1: Fundamentos</h4>
+                <div class="episode-list">
+                  <button class="episode-item" type="button"><span>Episódio 01: O que é Mercado Livre de Energia</span><strong>32 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 02: Quem pode migrar</span><strong>28 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 03: Benefícios financeiros</span><strong>35 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 04: Contratos e prazos</span><strong>30 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 05: Papel da comercializadora</span><strong>26 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 06: Jornada de migração</span><strong>33 min</strong></button>
+                </div>
+              </section>
+
+              <section class="season-card">
+                <h4>Temporada 2: Estratégia e Gestão</h4>
+                <div class="episode-list">
+                  <button class="episode-item" type="button"><span>Episódio 01: Estratégia de compra de energia</span><strong>38 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 02: Riscos e proteção de carteira</span><strong>29 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 03: Governança energética</span><strong>31 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 04: Indicadores de performance</span><strong>34 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 05: Eficiência e previsibilidade</span><strong>27 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 06: Casos reais de economia</span><strong>36 min</strong></button>
+                </div>
+              </section>
+
+              <section class="season-card">
+                <h4>Temporada 3: Tendências do Setor</h4>
+                <div class="episode-list">
+                  <button class="episode-item" type="button"><span>Episódio 01: Abertura do mercado no Brasil</span><strong>33 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 02: ESG e energia limpa</span><strong>30 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 03: Inovação em comercialização</span><strong>37 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 04: Dados para tomada de decisão</span><strong>29 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 05: Futuro do consumidor livre</span><strong>35 min</strong></button>
+                  <button class="episode-item" type="button"><span>Episódio 06: Especial com especialista convidado</span><strong>40 min</strong></button>
+                </div>
+              </section>
+            </div>
+          </article>
+        </section>
+
+        <section class="tab-panel hidden" data-tab-panel="live">
+          <article class="window-card panel live-panel">
+            <div class="panel-head">
+              <h3>Live Semanal</h3>
+              <p>
+                Transmissão toda quinta-feira às 20h sobre Mercado Livre de Energia.
+              </p>
+            </div>
+
+            <div class="live-grid">
+              <div class="live-main">
+                <div class="live-player-box" role="region" aria-label="Player da live">
+                  <video id="livePlayer" controls preload="metadata" poster="./assets/brand/clients/enel.png">
+                    <source src="./assets/enel/videos/Assinatura_ENEL.mov" type="video/quicktime" />
+                  </video>
+                  <p class="live-note">
+                    Player principal da live. No dia da transmissão, substitua pelo sinal oficial.
+                  </p>
+                </div>
+
+                <div class="countdown-card">
+                  <p class="countdown-title">Próxima live em:</p>
+                  <div class="countdown-grid">
+                    <article>
+                      <p id="liveDays" class="countdown-value">00</p>
+                      <p class="countdown-label">Dias</p>
+                    </article>
+                    <article>
+                      <p id="liveHours" class="countdown-value">00</p>
+                      <p class="countdown-label">Horas</p>
+                    </article>
+                    <article>
+                      <p id="liveMinutes" class="countdown-value">00</p>
+                      <p class="countdown-label">Min</p>
+                    </article>
+                    <article>
+                      <p id="liveSeconds" class="countdown-value">00</p>
+                      <p class="countdown-label">Seg</p>
+                    </article>
+                  </div>
+                  <p id="liveNextDate" class="countdown-next"></p>
+                </div>
+              </div>
+
+              <aside class="live-comments">
+                <h4>Comentários ao vivo</h4>
+                <form id="liveCommentForm" class="live-comment-form">
+                  <input id="liveCommentInput" type="text" placeholder="Escreva seu comentário" maxlength="280" />
+                  <button type="submit" class="btn btn-primary">Publicar</button>
+                </form>
+                <div id="liveCommentsList" class="live-comments-list"></div>
+              </aside>
+            </div>
+          </article>
+        </section>
+
+        <section class="tab-panel hidden" data-tab-panel="novidades">
+          <article class="window-card panel">
+            <div class="panel-head">
+              <h3>Novidades</h3>
+              <p>
+                Atualizações, notícias e conteúdos recentes sobre Mercado Livre de Energia.
+              </p>
+            </div>
+
+            <div class="news-grid">
+              <article class="news-card">
+                <p class="news-date">03/03/2026</p>
+                <h4>Mercado Livre amplia oportunidades para novos consumidores</h4>
+                <p>Entenda os movimentos mais recentes e como as empresas podem se preparar para migrar.</p>
+                <span class="news-tag">Mercado</span>
+              </article>
+
+              <article class="news-card">
+                <p class="news-date">01/03/2026</p>
+                <h4>Boas práticas de contratação de energia para 2026</h4>
+                <p>Especialistas compartilham critérios para reduzir risco e aumentar previsibilidade.</p>
+                <span class="news-tag">Estratégia</span>
+              </article>
+
+              <article class="news-card">
+                <p class="news-date">27/02/2026</p>
+                <h4>Como comparar propostas no Ambiente de Contratação Livre</h4>
+                <p>Veja os principais pontos para avaliar preço, flexibilidade e suporte da comercializadora.</p>
+                <span class="news-tag">Guia</span>
+              </article>
+
+              <article class="news-card">
+                <p class="news-date">25/02/2026</p>
+                <h4>Tendências de consumo e eficiência energética no setor corporativo</h4>
+                <p>Empresas investem em monitoramento e gestão ativa para elevar desempenho energético.</p>
+                <span class="news-tag">Eficiência</span>
+              </article>
+
+              <article class="news-card">
+                <p class="news-date">20/02/2026</p>
+                <h4>Checklist para iniciar a migração com segurança</h4>
+                <p>Passo a passo essencial para mapear perfil de consumo e estruturar a jornada.</p>
+                <span class="news-tag">Operação</span>
+              </article>
+
+              <article class="news-card">
+                <p class="news-date">18/02/2026</p>
+                <h4>Live da semana: dúvidas frequentes de quem está começando</h4>
+                <p>Resumo dos principais pontos discutidos na última transmissão com especialistas.</p>
+                <span class="news-tag">Comunidade</span>
+              </article>
+            </div>
+          </article>
         </section>
       </main>
-
-      <footer class="brand-footer window-card">
-        <p class="eyebrow">Assinaturas de marca</p>
-        <div class="footer-logos">
-          <img src="./assets/brand/clients/enel.png" alt="Enel" />
-          <div class="footer-dark-logo">
-            <img src="./assets/enel/logos/Logo bianco png.png" alt="Enel branco" />
-          </div>
-          <img src="./assets/brand/clients/porto.png" alt="Porto" />
-          <img src="./assets/brand/clients/bank.png" alt="Bank" />
-        </div>
-      </footer>
     </section>
 
     <div id="quizModal" class="modal hidden" aria-hidden="true">
