@@ -3,6 +3,7 @@ const STORAGE_SESSION = "plataformaEnel.session";
 const STORAGE_LIVE_COMMENTS = "plataformaEnel.liveComments";
 const QUIZ_POINTS_PER_QUESTION = 2;
 const TEST_MODE = true;
+const PHASE_VIDEO_FALLBACK = "./assets/enel/videos/Assinatura_ENEL.mov";
 
 const TEST_ACCOUNT = {
   username: "usuário",
@@ -21,7 +22,7 @@ const BASE_PHASES = [
     title: "Fase 1 - Fundamentos do Mercado Livre",
     description:
       "Entenda o que é o Mercado Livre de Energia, quem pode aderir e quais ganhos de previsibilidade e competitividade ele oferece.",
-    videoSrc: "./assets/enel/videos/fase-1.mp4",
+    videoSrc: "./assets/enel/videos/Enel_Energia_Preco_eco_Garan_video_02_web.mp4",
     questions: [
       {
         prompt: "O que é Mercado Livre de Energia?",
@@ -333,6 +334,19 @@ function bootstrap() {
   });
 
   elements.phaseVideo.addEventListener("error", () => {
+    const fallbackTried = elements.phaseVideo.dataset.fallbackTried === "true";
+    if (!fallbackTried) {
+      elements.phaseVideo.dataset.fallbackTried = "true";
+      elements.phaseVideo.src = PHASE_VIDEO_FALLBACK;
+      elements.phaseVideo.load();
+      setMessage(
+        elements.videoStatus,
+        "Vídeo principal indisponível. Carregamos uma versão alternativa.",
+        "message-warning"
+      );
+      return;
+    }
+
     state.watchedCurrentVideo = true;
     elements.startQuizButton.disabled = false;
     setMessage(
@@ -487,6 +501,7 @@ function openPhase(phaseId) {
   elements.phaseEmpty.classList.add("hidden");
   elements.phaseMission.classList.remove("hidden");
 
+  elements.phaseVideo.dataset.fallbackTried = "false";
   elements.phaseVideo.src = phase.videoSrc;
   elements.phaseVideo.load();
 
